@@ -1,0 +1,12 @@
+For all designs I ask you to make, have them be beautiful, production-worthy, and follow Material Design 3 principles.
+
+This project REQUIRES Material-UI (@mui/material) for all UI components. DO NOT use Tailwind CSS or Lucide icons. Use TSX only.
+
+Stack requirements:
+✅ Material-UI 6.1.9 for ALL components
+✅ Emotion for styling (MUI's CSS-in-JS)
+✅ Material Icons (@mui/icons-material)
+✅ React 19.0.0, Next.js 15.1.3, TypeScript 5.7.2
+✅ Zustand for state, SWR for data fetching, react-i18next for translations
+
+DO NOT install Tailwind, Lucide, shadcn, or alternative UI libraries. Material-UI is mandatory for this project.
