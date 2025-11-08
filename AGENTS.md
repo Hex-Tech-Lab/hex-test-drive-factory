@@ -126,6 +126,37 @@ Example: `🔧 Fix deployment issues + integrate Supabase + add analytics`
 - State downstream effects: "Will start collecting data immediately after deploy"
 
 **File Manifest Structure** (required when ≥5 files changed):
+📁 Files Modified/Created:
+NEW FILES:
+
+path/to/file.ts (Brief purpose description)
+
+path/to/another.tsx (Brief purpose)
+
+MODIFIED FILES:
+✏️ path/to/existing.ts (What changed in 2-5 words)
+✏️ path/to/component.tsx (What changed)
+
+text
+
+**Validation Status Footer** (required for all merges to main):
+✅ Build Status: SUCCESSFUL
+✅ TypeScript: No errors (0 warnings)
+✅ Tests: 47/47 passing
+✅ Lint: Clean
+✅ Data Source: [Database name] ([count] records)
+✅ Deployment: [Platform] ([environment])
+
+text
+
+**Anti-Patterns to Avoid**:
+- ❌ Vague verbs: "Updated stuff", "Fixed things", "Changed code"
+- ❌ Missing versions: "Installed package" (should be "v1.2.0")
+- ❌ Incomplete file paths: "Updated utils" (should be "src/lib/utils.ts")
+- ❌ No outcomes: "Added analytics" (should be "Analytics collecting data on deploy")
+- ❌ Passive voice: "Analytics were added" (should be "Added <Analytics /> component")
+
+**Example Reference**: See commit `b6b1d28` in this repo for full template usage.
 
 
 Part 5: Planned Features (Roadmap with Dependencies)
