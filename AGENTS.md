@@ -100,6 +100,34 @@ Visual diff loop for UI changes with screenshots in PR
 
 No new runtime dependencies without justification in PR description
 
+**Commit Message Format (Mandatory Structure)**
+
+All commits must follow this multi-section template with emoji prefixes and hierarchical detail:
+
+**Header**: Single-line summary with scope emoji + action verb + brief impact
+Example: `🔧 Fix deployment issues + integrate Supabase + add analytics`
+
+**Sections** (use relevant subset, minimum 2):
+- 🔧 Bug Fixes: Issues resolved with root cause explanation
+- ✨ Features: New capabilities with user-facing outcomes
+- 🗄️ Database: Schema changes, migrations, query optimizations
+- 🐛 Critical Bugs: High-severity issues with immediate business impact
+- 📊 Analytics/Monitoring: Instrumentation, logging, metrics additions
+- 🚀 Performance: Build optimizations, caching, load time improvements
+- 📘 Architecture: Structural changes, patterns introduced, type systems
+- 🔐 Security: Auth flows, data protection, vulnerability patches
+- 📁 File Manifest: Comprehensive list of modifications (required for >5 files)
+
+**Per-Section Format**:
+- Lead with "CRITICAL:" label if blocking or high-priority
+- Use ✅ checkmarks for completed items (never ❌ or ⏸️ in commits)
+- Include specifics: version numbers (v2.80.0), file paths (src/lib/supabase.ts), counts (74 vehicles)
+- Explain technical decisions: "Uses router.replace() + pathname instead of router.push()"
+- State downstream effects: "Will start collecting data immediately after deploy"
+
+**File Manifest Structure** (required when ≥5 files changed):
+
+
 Part 5: Planned Features (Roadmap with Dependencies)
 
 🔄 In Progress: Vehicle Detail Pages with Trims (~15% complete)
