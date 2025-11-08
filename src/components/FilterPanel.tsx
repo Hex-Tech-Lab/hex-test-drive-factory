@@ -1,8 +1,8 @@
 'use client';
 
 import { Box, Paper, Typography, FormGroup, FormControlLabel, Checkbox, Slider, Divider, Button } from '@mui/material';
-import { useState } from 'react';
-import { getBrands } from '@/lib/mock-data';
+import { useState, useMemo } from 'react';
+import { Vehicle, getBrandsFromNormalized } from '@/lib/mock-data';
 import { useLanguageStore } from '@/stores/language-store';
 
 interface FilterPanelProps {
@@ -11,16 +11,23 @@ interface FilterPanelProps {
     priceRange: [number, number];
     categories: string[];
   }) => void;
+  vehicles: Vehicle[];
 }
 
-export default function FilterPanel({ onFilterChange }: FilterPanelProps) {
+export default function FilterPanel({ onFilterChange, vehicles }: FilterPanelProps) {
   const language = useLanguageStore((state) => state.language);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 20000000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-  const brands = getBrands();
-  const categories = ['sedan', 'suv', 'crossover', 'sports', 'electric', 'luxury'];
+  // Extract unique brands from fetched vehicles
+  const brands = useMemo(() => getBrandsFromNormalized(vehicles), [vehicles]);
+  
+  // Extract unique categories from fetched vehicles
+  const categories = useMemo(() => 
+    Array.from(new Set(vehicles.map(v => v.categories.name))), 
+    [vehicles]
+  );
 
   const categoryLabels: Record<string, { ar: string; en: string }> = {
     sedan: { ar: 'سيدان', en: 'Sedan' },

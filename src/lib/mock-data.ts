@@ -1,4 +1,44 @@
+// Updated Vehicle interface for normalized Supabase schema
 export interface Vehicle {
+  id: string;
+  brand_id: string;
+  model_id: string;
+  model_year: number;
+  price_egp: number;
+  trim_name: string;
+  engine?: string;
+  seats?: number;
+  horsepower?: number;
+  torque_nm?: number;
+  acceleration_0_100?: number;
+  top_speed?: number;
+  fuel_consumption?: string;
+  features?: string[];
+  available_venues?: string[];
+  
+  // Nested relations from Supabase JOIN
+  models: {
+    name: string;
+    hero_image_url?: string;
+    hover_image_url?: string;
+    brands: {
+      name: string;
+      logo_url?: string;
+    };
+  };
+  categories: {
+    name: string;
+  };
+  transmissions: {
+    name: string;
+  };
+  fuel_types: {
+    name: string;
+  };
+}
+
+// Legacy interface for backwards compatibility
+export interface VehicleLegacy {
   id: string;
   brand: string;
   model: string;
@@ -1010,8 +1050,14 @@ export function getVehiclesByBrand(brand: string): Vehicle[] {
   return vehicles.filter(v => v.brand === brand);
 }
 
+// Helper to extract unique brands from legacy data (kept for backwards compatibility)
 export function getBrands(): string[] {
   return Array.from(new Set(vehicles.map(v => v.brand)));
+}
+
+// Helper to extract brands from normalized Supabase vehicles
+export function getBrandsFromNormalized(vehicles: Vehicle[]): string[] {
+  return Array.from(new Set(vehicles.map(v => v.models.brands.name)));
 }
 
 export function filterVehicles(filters: {

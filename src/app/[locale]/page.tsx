@@ -6,9 +6,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import Header from '@/components/Header';
 import VehicleCard from '@/components/VehicleCard';
 import FilterPanel from '@/components/FilterPanel';
-import { vehicles, filterVehicles } from '@/lib/mock-data';
+import { Vehicle } from '@/lib/mock-data';
+import { supabase } from '@/lib/supabase';
 import { useLanguageStore } from '@/stores/language-store';
-import { useParams } from 'next/navigation';
+import { useParams} from 'next/navigation';
 
 export default function CatalogPage() {
   const params = useParams();
@@ -16,6 +17,8 @@ export default function CatalogPage() {
   const language = useLanguageStore((state) => state.language);
   const setLanguage = useLanguageStore((state) => state.setLanguage);
   const [searchQuery, setSearchQuery] = useState('');
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<{
     brands: string[];
     priceRange: [number, number];
@@ -32,26 +35,81 @@ export default function CatalogPage() {
     }
   }, [locale, setLanguage]);
 
+  // Fetch vehicles from Supabase with JOINs for normalized schema
+  useEffect(() => {
+    async function fetchVehicles() {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('vehicles')
+          .select(`
+            *,
+            models!inner(
+              name,
+              hero_image_url,
+              hover_image_url,
+              brands!inner(
+                name,
+                logo_url
+              )
+            ),
+            categories!inner(name),
+            transmissions!inner(name),
+            fuel_types!inner(name)
+          `);
+        
+        if (error) {
+          console.error('Error fetching vehicles from Supabase:', error);
+          setVehicles([]);
+        } else {
+          setVehicles((data as Vehicle[]) || []);
+        }
+      } catch (err) {
+        console.error('Unexpected error fetching vehicles:', err);
+        setVehicles([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchVehicles();
+  }, []);
+
   const filteredVehicles = useMemo(() => {
-    let results = filterVehicles({
-      brands: filters.brands,
-      priceMin: filters.priceRange[0],
-      priceMax: filters.priceRange[1],
-      categories: filters.categories,
+    // Apply filters to vehicles from Supabase with nested properties
+    let results = vehicles.filter((vehicle) => {
+      // Brand filter - use nested brand name
+      if (filters.brands.length > 0 && !filters.brands.includes(vehicle.models.brands.name)) {
+        return false;
+      }
+
+      // Price range filter
+      if (vehicle.price_egp < filters.priceRange[0] || vehicle.price_egp > filters.priceRange[1]) {
+        return false;
+      }
+
+      // Category filter - use nested category name
+      if (filters.categories.length > 0 && !filters.categories.includes(vehicle.categories.name)) {
+        return false;
+      }
+
+      return true;
     });
 
+    // Search query filter - use nested properties
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       results = results.filter(
         (v) =>
-          v.brand.toLowerCase().includes(query) ||
-          v.model.toLowerCase().includes(query) ||
-          v.category.toLowerCase().includes(query)
+          v.models.brands.name.toLowerCase().includes(query) ||
+          v.models.name.toLowerCase().includes(query) ||
+          v.trim_name.toLowerCase().includes(query) ||
+          v.categories.name.toLowerCase().includes(query)
       );
     }
 
     return results;
-  }, [filters, searchQuery]);
+  }, [vehicles, filters, searchQuery]);
 
   return (
     <>
@@ -78,7 +136,7 @@ export default function CatalogPage() {
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={3}>
-            <FilterPanel onFilterChange={setFilters} />
+            <FilterPanel onFilterChange={setFilters} vehicles={vehicles} />
           </Grid>
 
           <Grid item xs={12} md={9}>
