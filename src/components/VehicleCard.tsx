@@ -6,6 +6,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Vehicle } from '@/types/vehicle';
 import { useCompareStore } from '@/stores/compare-store';
 import { useLanguageStore } from '@/stores/language-store';
+import { getVehicleImage, formatPrice as formatPriceHelper } from '@/lib/imageHelper';
 
 interface VehicleCardProps {
   vehicle: Vehicle;

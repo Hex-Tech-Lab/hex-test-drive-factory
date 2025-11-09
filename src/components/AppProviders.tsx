@@ -5,7 +5,7 @@ import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import { prefixer } from 'stylis';
 import rtlPlugin from 'stylis-plugin-rtl';
-import { lightTheme, createRTLTheme } from '@/lib/theme';
+import { getTheme } from '@/lib/theme';
 import { useLanguageStore } from '@/stores/language-store';
 import { useEffect, useState } from 'react';
 
@@ -16,6 +16,7 @@ const cacheRtl = createCache({
 
 const cacheLtr = createCache({
   key: 'muiltr',
+  stylisPlugins: [prefixer],
 });
 
 export default function AppProviders({ children }: { children: React.ReactNode }) {
@@ -25,13 +26,14 @@ export default function AppProviders({ children }: { children: React.ReactNode }
   useEffect(() => {
     setMounted(true);
     document.dir = language === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = language;
   }, [language]);
 
   if (!mounted) {
     return null;
   }
 
-  const theme = language === 'ar' ? createRTLTheme(lightTheme) : lightTheme;
+  const theme = getTheme(language);
   const cache = language === 'ar' ? cacheRtl : cacheLtr;
 
   return (
