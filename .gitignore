@@ -4,7 +4,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
+https://github.com/Hex-Tech-Lab/hex-test-drive-factory/pull/4lerna-debug.log*
 
 node_modules
 dist
@@ -21,10 +21,8 @@ dist-ssr
 *.sln
 *.sw?
 .env
+.env.local
 
 # Build artifacts (contains API keys)
 .next/
 *.tsbuildinfo
-
-# Build artifacts (contains API keys)
-.next/

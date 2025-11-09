@@ -1,0 +1,43 @@
+# CodeRabbit AI Code Review Configuration
+# https://docs.coderabbit.ai/configuration
+
+language: en-US
+
+early_access: false
+
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    ignore_title_keywords:
+      - "WIP"
+      - "DO NOT REVIEW"
+  drafts: false
+  auto_incremental_review: true
+
+chat:
+  auto_reply: true
+
+# Force review even for bot commits
+bot_reviews:
+  enabled: true
+  skip_bot_prs: false
+
+# Review all file types
+path_filters:
+  excluded: []
+
+# Review small PRs (don't skip based on size)
+size_filters:
+  min_lines: 0
+  max_lines: 10000
+
+# Force reviews for all PR types
+pr_filters:
+  excluded_labels: []
+  excluded_pr_numbers: []
