@@ -21,3 +21,10 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Build artifacts (contains API keys)
+.next/
+*.tsbuildinfo
+
+# Build artifacts (contains API keys)
+.next/
