@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { Vehicle } from '@/lib/mock-data';
+import { persist } from 'zustand/middleware';
+import { Vehicle } from '@/lib/mock-data'; // Will change to Supabase later
 
 interface CompareStore {
   compareItems: Vehicle[];
@@ -8,19 +9,26 @@ interface CompareStore {
   clearCompare: () => void;
 }
 
-export const useCompareStore = create<CompareStore>((set) => ({
-  compareItems: [],
-  addToCompare: (vehicle) => {
-    set((state) => ({
-      compareItems: [...state.compareItems, vehicle],
-    }));
-  },
-  removeFromCompare: (vehicleId) => {
-    set((state) => ({
-      compareItems: state.compareItems.filter(v => v.id !== vehicleId),
-    }));
-  },
-  clearCompare: () => {
-    set({ compareItems: [] });
-  },
-}));
+export const useCompareStore = create<CompareStore>()(
+  persist(
+    (set) => ({
+      compareItems: [],
+      addToCompare: (vehicle) => {
+        set((state) => ({
+          compareItems: [...state.compareItems, vehicle],
+        }));
+      },
+      removeFromCompare: (vehicleId) => {
+        set((state) => ({
+          compareItems: state.compareItems.filter(v => v.id !== vehicleId),
+        }));
+      },
+      clearCompare: () => {
+        set({ compareItems: [] });
+      },
+    }),
+    {
+      name: 'compare-storage', // localStorage key
+    }
+  )
+);

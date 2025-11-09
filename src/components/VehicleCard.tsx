@@ -51,24 +51,24 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
       <CardMedia
         component="img"
         height="200"
-        image={vehicle.image_url}
-        alt={`${vehicle.brand} ${vehicle.model}`}
+        image={vehicle.models.hero_image_url || 'https://via.placeholder.com/800x600?text=No+Image'}
+        alt={`${vehicle.models.brands.name} ${vehicle.models.name}`}
         sx={{ objectFit: 'cover' }}
       />
 
       <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         <Typography variant="h6" gutterBottom>
-          {vehicle.brand} {vehicle.model}
+          {vehicle.models.brands.name} {vehicle.models.name}
         </Typography>
 
         <Typography variant="body2" color="text.secondary" gutterBottom>
-          {vehicle.year} • {vehicle.category}
+          {vehicle.model_year} • {vehicle.trim_name} • {vehicle.categories.name}
         </Typography>
 
         <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mb: 2 }}>
-          <Chip label={vehicle.fuel_type} size="small" variant="outlined" />
-          <Chip label={vehicle.transmission} size="small" variant="outlined" />
-          <Chip label={`${vehicle.seats} ${language === 'ar' ? 'مقاعد' : 'seats'}`} size="small" variant="outlined" />
+          <Chip label={vehicle.fuel_types.name} size="small" variant="outlined" />
+          <Chip label={vehicle.transmissions.name} size="small" variant="outlined" />
+          {vehicle.seats && <Chip label={`${vehicle.seats} ${language === 'ar' ? 'مقاعد' : 'seats'}`} size="small" variant="outlined" />}
         </Box>
 
         <Typography variant="h5" color="primary" sx={{ mt: 'auto', fontWeight: 600 }}>

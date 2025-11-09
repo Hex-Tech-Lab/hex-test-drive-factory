@@ -96,13 +96,13 @@ export default function ComparePage() {
                   <CardMedia
                     component="img"
                     height="200"
-                    image={vehicle.image_url}
-                    alt={`${vehicle.brand} ${vehicle.model}`}
+                    image={vehicle.models.hero_image_url || 'https://via.placeholder.com/800x600?text=No+Image'}
+                    alt={`${vehicle.models.brands.name} ${vehicle.models.name}`}
                   />
                 </Box>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
-                    {vehicle.brand} {vehicle.model}
+                    {vehicle.models.brands.name} {vehicle.models.name}
                   </Typography>
                   <Typography variant="h5" color="primary" gutterBottom>
                     {formatPrice(vehicle.price_egp)} {language === 'ar' ? 'ج.م' : 'EGP'}
@@ -123,67 +123,73 @@ export default function ComparePage() {
               <TableRow>
                 <TableCell><strong>{language === 'ar' ? 'السنة' : 'Year'}</strong></TableCell>
                 {compareItems.map((v) => (
-                  <TableCell key={v.id}>{v.year}</TableCell>
+                  <TableCell key={v.id}>{v.model_year}</TableCell>
                 ))}
               </TableRow>
               <TableRow>
-                <TableCell><strong>{language === 'ar' ? 'الفئة' : 'Category'}</strong></TableCell>
+                <TableCell><strong>{language === 'ar' ? 'الفئة' : 'Trim'}</strong></TableCell>
                 {compareItems.map((v) => (
-                  <TableCell key={v.id}>{v.category}</TableCell>
+                  <TableCell key={v.id}>{v.trim_name}</TableCell>
+                ))}
+              </TableRow>
+              <TableRow>
+                <TableCell><strong>{language === 'ar' ? 'التصنيف' : 'Category'}</strong></TableCell>
+                {compareItems.map((v) => (
+                  <TableCell key={v.id}>{v.categories.name}</TableCell>
                 ))}
               </TableRow>
               <TableRow>
                 <TableCell><strong>{language === 'ar' ? 'المحرك' : 'Engine'}</strong></TableCell>
                 {compareItems.map((v) => (
-                  <TableCell key={v.id}>{v.engine}</TableCell>
+                  <TableCell key={v.id}>{v.engine || '-'}</TableCell>
                 ))}
               </TableRow>
               <TableRow>
                 <TableCell><strong>{language === 'ar' ? 'ناقل الحركة' : 'Transmission'}</strong></TableCell>
                 {compareItems.map((v) => (
-                  <TableCell key={v.id}>{v.transmission}</TableCell>
+                  <TableCell key={v.id}>{v.transmissions.name}</TableCell>
                 ))}
               </TableRow>
               <TableRow>
                 <TableCell><strong>{language === 'ar' ? 'نوع الوقود' : 'Fuel Type'}</strong></TableCell>
                 {compareItems.map((v) => (
-                  <TableCell key={v.id}>{v.fuel_type}</TableCell>
+                  <TableCell key={v.id}>{v.fuel_types.name}</TableCell>
                 ))}
               </TableRow>
               <TableRow>
                 <TableCell><strong>{language === 'ar' ? 'القوة الحصانية' : 'Horsepower'}</strong></TableCell>
                 {compareItems.map((v) => (
-                  <TableCell key={v.id}>{v.specs.horsepower} HP</TableCell>
+                  <TableCell key={v.id}>{v.horsepower ? `${v.horsepower} HP` : '-'}</TableCell>
                 ))}
               </TableRow>
               <TableRow>
                 <TableCell><strong>{language === 'ar' ? 'عزم الدوران' : 'Torque'}</strong></TableCell>
                 {compareItems.map((v) => (
-                  <TableCell key={v.id}>{v.specs.torque_nm} Nm</TableCell>
+                  <TableCell key={v.id}>{v.torque_nm ? `${v.torque_nm} Nm` : '-'}</TableCell>
                 ))}
               </TableRow>
               <TableRow>
                 <TableCell><strong>{language === 'ar' ? 'التسارع 0-100' : '0-100 km/h'}</strong></TableCell>
                 {compareItems.map((v) => (
-                  <TableCell key={v.id}>{v.specs.acceleration_0_100}s</TableCell>
+                  <TableCell key={v.id}>{v.acceleration_0_100 ? `${v.acceleration_0_100}s` : '-'}</TableCell>
                 ))}
               </TableRow>
               <TableRow>
                 <TableCell><strong>{language === 'ar' ? 'السرعة القصوى' : 'Top Speed'}</strong></TableCell>
                 {compareItems.map((v) => (
-                  <TableCell key={v.id}>{v.specs.top_speed} km/h</TableCell>
+                  <TableCell key={v.id}>{v.top_speed ? `${v.top_speed} km/h` : '-'}</TableCell>
                 ))}
               </TableRow>
               <TableRow>
                 <TableCell><strong>{language === 'ar' ? 'استهلاك الوقود' : 'Fuel Consumption'}</strong></TableCell>
                 {compareItems.map((v) => (
-                  <TableCell key={v.id}>{v.specs.fuel_consumption}</TableCell>
+                  <TableCell key={v.id}>{v.fuel_consumption || '-'}</TableCell>
                 ))}
               </TableRow>
               <TableRow>
                 <TableCell><strong>{language === 'ar' ? 'المقاعد' : 'Seats'}</strong></TableCell>
                 {compareItems.map((v) => (
-                  <TableCell key={v.id}>{v.seats}</TableCell>
+                  <TableCell key={v.id}>{v.seats || '-'}</TableCell>
                 ))}
               </TableRow>
             </TableBody>
