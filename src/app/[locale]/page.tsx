@@ -9,6 +9,7 @@ import FilterPanel from '@/components/FilterPanel';
 import { Vehicle } from '@/types/vehicle';
 import { supabase } from '@/lib/supabase';
 import { useLanguageStore } from '@/stores/language-store';
+import { useFilterStore } from '@/stores/filter-store';
 import { useParams } from 'next/navigation';
 
 export default function CatalogPage() {
@@ -20,15 +21,14 @@ export default function CatalogPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState<{
-    brands: string[];
-    priceRange: [number, number];
-    categories: string[];
-  }>({
-    brands: [],
-    priceRange: [0, 20000000],
-    categories: [],
-  });
+  
+  // Use persistent filter store
+  const filters = useFilterStore((state) => ({
+    brands: state.brands,
+    priceRange: state.priceRange,
+    categories: state.categories,
+  }));
+  const setFiltersInStore = useFilterStore((state) => state.setFilters);
 
   useEffect(() => {
     if (locale === 'ar' || locale === 'en') {
@@ -171,7 +171,7 @@ export default function CatalogPage() {
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={3}>
-            <FilterPanel onFilterChange={setFilters} vehicles={vehicles} />
+            <FilterPanel onFilterChange={setFiltersInStore} vehicles={vehicles} />
           </Grid>
 
           <Grid item xs={12} md={9}>

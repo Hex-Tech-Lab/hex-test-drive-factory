@@ -64,15 +64,29 @@ export default function FilterPanel({ vehicles, onFilterChange }: FilterPanelPro
     onFilterChange({ brands: selectedBrands, priceRange: newRange, categories: selectedCategories });
   };
 
+  // Dynamic max price based on available vehicles
+  const maxPrice = useMemo(() => {
+    if (vehicles.length === 0) return 20_000_000;
+    const prices = vehicles.map(v => v.price_egp).filter(p => p > 0);
+    return prices.length > 0 ? Math.max(...prices) : 20_000_000;
+  }, [vehicles]);
+
   const handleReset = () => {
     setSelectedBrands([]);
     setSelectedCategories([]);
-    setPriceRange([0, 20000000]);
-    onFilterChange({ brands: [], priceRange: [0, 20000000], categories: [] });
+    const resetRange: [number, number] = [0, maxPrice];
+    setPriceRange(resetRange);
+    onFilterChange({ brands: [], priceRange: resetRange, categories: [] });
   };
 
-  const formatPrice = (value: number) => {
-    return `${(value / 1000).toFixed(0)}K`;
+  const formatPrice = (value: number): string => {
+    if (value >= 1_000_000) {
+      return `${(value / 1_000_000).toFixed(1)}M`;
+    }
+    if (value >= 1_000) {
+      return `${(value / 1_000).toFixed(0)}K`;
+    }
+    return `${value}`;
   };
 
   return (
@@ -140,13 +154,19 @@ export default function FilterPanel({ vehicles, onFilterChange }: FilterPanelPro
           onChange={handlePriceChange}
           valueLabelDisplay="auto"
           min={0}
-          max={5000000}
-          step={100000}
+          max={maxPrice}
+          step={100_000}
           valueLabelFormat={formatPrice}
+          sx={{ mt: 2, mb: 1 }}
         />
-        <Typography variant="body2" color="text.secondary">
-          {priceRange[0].toLocaleString()} - {priceRange[1].toLocaleString()} EGP
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Typography variant="body2" color="text.secondary">
+            {formatPrice(priceRange[0])} EGP
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {formatPrice(priceRange[1])} EGP
+          </Typography>
+        </Box>
       </Box>
     </Paper>
   );

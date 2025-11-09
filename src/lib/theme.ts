@@ -1,6 +1,6 @@
 import { createTheme, ThemeOptions } from '@mui/material/styles';
 
-const themeOptions: ThemeOptions = {
+const baseThemeOptions: ThemeOptions = {
   palette: {
     primary: {
       main: '#1976d2',
@@ -20,7 +20,24 @@ const themeOptions: ThemeOptions = {
   },
 };
 
-export const lightTheme = createTheme(themeOptions);
+export const lightTheme = createTheme(baseThemeOptions);
+
+/**
+ * Create theme with locale-specific settings
+ * @param locale - Language code (en or ar)
+ * @returns Theme configured for the locale
+ */
+export function getTheme(locale: string) {
+  return createTheme({
+    ...baseThemeOptions,
+    direction: locale === 'ar' ? 'rtl' : 'ltr',
+    typography: {
+      fontFamily: locale === 'ar' 
+        ? 'Cairo, Roboto, Arial, sans-serif' 
+        : 'Roboto, Arial, sans-serif',
+    },
+  });
+}
 
 export function createRTLTheme(baseTheme: ReturnType<typeof createTheme>) {
   return createTheme({
