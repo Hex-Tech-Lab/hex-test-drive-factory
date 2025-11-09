@@ -1,10 +1,15 @@
-import { withSentryConfig } from '@sentry/nextjs';
+// TEMPORARY: Sentry disabled to unblock deployment (Next.js 15 requires instrumentation.ts)
+// TODO: Re-enable with proper instrumentation.ts setup
+// import { withSentryConfig } from '@sentry/nextjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   /* config options here */
 };
 
+export default nextConfig;
+
+/* TEMPORARY: Commented out until Sentry is migrated to instrumentation.ts
 export default withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
@@ -39,3 +44,4 @@ export default withSentryConfig(nextConfig, {
   // https://vercel.com/docs/cron-jobs
   automaticVercelMonitors: true,
 });
+*/
