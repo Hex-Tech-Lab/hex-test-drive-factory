@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Vehicle } from '@/lib/mock-data'; // Will change to Supabase later
+import { Vehicle } from '@/types/vehicle';
 
 interface CompareStore {
   compareItems: Vehicle[];

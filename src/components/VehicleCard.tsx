@@ -3,7 +3,7 @@
 import { Card, CardMedia, CardContent, Typography, Box, Chip, Button, IconButton } from '@mui/material';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { Vehicle } from '@/lib/mock-data';
+import { Vehicle } from '@/types/vehicle';
 import { useCompareStore } from '@/stores/compare-store';
 import { useLanguageStore } from '@/stores/language-store';
 

@@ -1,24 +1,25 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
-import { Container, Grid, Typography, Box, TextField, InputAdornment } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Container, Grid, Typography, Box, TextField, InputAdornment, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Header from '@/components/Header';
 import VehicleCard from '@/components/VehicleCard';
 import FilterPanel from '@/components/FilterPanel';
-import { Vehicle } from '@/lib/mock-data';
+import { Vehicle } from '@/types/vehicle';
 import { supabase } from '@/lib/supabase';
 import { useLanguageStore } from '@/stores/language-store';
-import { useParams} from 'next/navigation';
+import { useParams } from 'next/navigation';
 
 export default function CatalogPage() {
   const params = useParams();
   const locale = params.locale as string;
   const language = useLanguageStore((state) => state.language);
   const setLanguage = useLanguageStore((state) => state.setLanguage);
-  const [searchQuery, setSearchQuery] = useState('');
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<{
     brands: string[];
     priceRange: [number, number];
@@ -35,15 +36,26 @@ export default function CatalogPage() {
     }
   }, [locale, setLanguage]);
 
-  // Fetch vehicles from Supabase with JOINs for normalized schema
   useEffect(() => {
     async function fetchVehicles() {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('vehicles')
+        const { data, error: fetchError } = await supabase
+          .from('vehicle_trims')
           .select(`
-            *,
+            id,
+            trim_name,
+            model_year,
+            price_egp,
+            engine,
+            seats,
+            horsepower,
+            torque_nm,
+            acceleration_0_100,
+            top_speed,
+            fuel_consumption,
+            features,
+            model_id,
             models!inner(
               name,
               hero_image_url,
@@ -57,16 +69,16 @@ export default function CatalogPage() {
             transmissions!inner(name),
             fuel_types!inner(name)
           `);
-        
-        if (error) {
-          console.error('Error fetching vehicles from Supabase:', error);
-          setVehicles([]);
+
+        if (fetchError) {
+          console.error('Supabase query error:', fetchError);
+          setError(fetchError.message);
         } else {
-          setVehicles((data as Vehicle[]) || []);
+          setVehicles((data as unknown as Vehicle[]) || []);
         }
       } catch (err) {
-        console.error('Unexpected error fetching vehicles:', err);
-        setVehicles([]);
+        console.error('Unexpected error:', err);
+        setError('Failed to load vehicles');
       } finally {
         setLoading(false);
       }
@@ -75,41 +87,64 @@ export default function CatalogPage() {
     fetchVehicles();
   }, []);
 
-  const filteredVehicles = useMemo(() => {
-    // Apply filters to vehicles from Supabase with nested properties
-    let results = vehicles.filter((vehicle) => {
-      // Brand filter - use nested brand name
-      if (filters.brands.length > 0 && !filters.brands.includes(vehicle.models.brands.name)) {
-        return false;
-      }
+  const filteredVehicles = vehicles.filter((vehicle) => {
+    // Brand filter
+    if (filters.brands.length > 0 && !filters.brands.includes(vehicle.models.brands.name)) {
+      return false;
+    }
 
-      // Price range filter
-      if (vehicle.price_egp < filters.priceRange[0] || vehicle.price_egp > filters.priceRange[1]) {
-        return false;
-      }
+    // Price filter
+    if (vehicle.price_egp < filters.priceRange[0] || vehicle.price_egp > filters.priceRange[1]) {
+      return false;
+    }
 
-      // Category filter - use nested category name
-      if (filters.categories.length > 0 && !filters.categories.includes(vehicle.categories.name)) {
-        return false;
-      }
+    // Category filter
+    if (filters.categories.length > 0 && !filters.categories.includes(vehicle.categories.name)) {
+      return false;
+    }
 
-      return true;
-    });
-
-    // Search query filter - use nested properties
+    // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      results = results.filter(
-        (v) =>
-          v.models.brands.name.toLowerCase().includes(query) ||
-          v.models.name.toLowerCase().includes(query) ||
-          v.trim_name.toLowerCase().includes(query) ||
-          v.categories.name.toLowerCase().includes(query)
+      return (
+        vehicle.models.brands.name.toLowerCase().includes(query) ||
+        vehicle.models.name.toLowerCase().includes(query) ||
+        vehicle.trim_name.toLowerCase().includes(query)
       );
     }
 
-    return results;
-  }, [vehicles, filters, searchQuery]);
+    return true;
+  });
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <Container maxWidth="xl" sx={{ py: 4, textAlign: 'center' }}>
+          <CircularProgress />
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
+          </Typography>
+        </Container>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <Header />
+        <Container maxWidth="xl" sx={{ py: 4 }}>
+          <Typography variant="h6" color="error">
+            {language === 'ar' ? 'فشل تحميل المركبات' : 'Failed to load vehicles'}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {error}
+          </Typography>
+        </Container>
+      </>
+    );
+  }
 
   return (
     <>
@@ -147,12 +182,7 @@ export default function CatalogPage() {
             </Typography>
 
             {filteredVehicles.length === 0 ? (
-              <Box
-                sx={{
-                  textAlign: 'center',
-                  py: 8,
-                }}
-              >
+              <Box sx={{ textAlign: 'center', py: 8 }}>
                 <Typography variant="h6" color="text.secondary">
                   {language === 'ar' ? 'لا توجد نتائج' : 'No results found'}
                 </Typography>
