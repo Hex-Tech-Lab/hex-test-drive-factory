@@ -22,12 +22,10 @@ export default function CatalogPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Use persistent filter store
-  const filters = useFilterStore((state) => ({
-    brands: state.brands,
-    priceRange: state.priceRange,
-    categories: state.categories,
-  }));
+  // Use persistent filter store - separate selectors to avoid infinite loop
+  const filterBrands = useFilterStore((state) => state.brands);
+  const filterPriceRange = useFilterStore((state) => state.priceRange);
+  const filterCategories = useFilterStore((state) => state.categories);
   const setFiltersInStore = useFilterStore((state) => state.setFilters);
 
   useEffect(() => {
@@ -70,11 +68,23 @@ export default function CatalogPage() {
             fuel_types!inner(name)
           `);
 
+        // DEBUG LOGGING
+        console.log('[CATALOG DEBUG]', {
+          vehicleCount: data?.length ?? 0,
+          hasError: !!fetchError,
+          errorMessage: fetchError?.message,
+          errorDetails: fetchError?.details,
+          errorCode: fetchError?.code,
+          rawData: data?.[0] || null
+        });
+
         if (fetchError) {
-          console.error('Supabase query error:', fetchError);
+          console.error('[CATALOG ERROR]', JSON.stringify(fetchError, null, 2));
           setError(fetchError.message);
         } else {
-          setVehicles((data as unknown as Vehicle[]) || []);
+          const vehicleData = (data as unknown as Vehicle[]) || [];
+          console.log('[CATALOG] Setting vehicles:', vehicleData.length);
+          setVehicles(vehicleData);
         }
       } catch (err) {
         console.error('Unexpected error:', err);
@@ -87,33 +97,25 @@ export default function CatalogPage() {
     fetchVehicles();
   }, []);
 
-  const filteredVehicles = vehicles.filter((vehicle) => {
-    // Brand filter
-    if (filters.brands.length > 0 && !filters.brands.includes(vehicle.models.brands.name)) {
-      return false;
-    }
+  // Debug: Log filter state
+  console.log('[FILTER DEBUG]', {
+    totalVehicles: vehicles.length,
+    filterBrands,
+    filterPriceRange,
+    filterCategories
+  });
 
-    // Price filter
-    if (vehicle.price_egp < filters.priceRange[0] || vehicle.price_egp > filters.priceRange[1]) {
-      return false;
-    }
+  // TEMPORARY: Bypass filters to test if they're causing the issue
+  const filteredVehicles = vehicles; // Show ALL vehicles temporarily
 
-    // Category filter
-    if (filters.categories.length > 0 && !filters.categories.includes(vehicle.categories.name)) {
-      return false;
-    }
-
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return (
-        vehicle.models.brands.name.toLowerCase().includes(query) ||
-        vehicle.models.name.toLowerCase().includes(query) ||
-        vehicle.trim_name.toLowerCase().includes(query)
-      );
-    }
-
-    return true;
+  console.log('[FILTER RESULTS]', {
+    totalVehicles: vehicles.length,
+    filteredCount: filteredVehicles.length,
+    sampleVehicle: vehicles[0] ? {
+      brand: vehicles[0].models.brands.name,
+      model: vehicles[0].models.name,
+      price: vehicles[0].price_egp
+    } : null
   });
 
   if (loading) {
