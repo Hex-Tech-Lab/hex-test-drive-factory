@@ -22,12 +22,10 @@ export default function CatalogPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Use persistent filter store
-  const filters = useFilterStore((state) => ({
-    brands: state.brands,
-    priceRange: state.priceRange,
-    categories: state.categories,
-  }));
+  // Use persistent filter store - separate selectors to avoid unnecessary re-renders
+  const filterBrands = useFilterStore((state) => state.brands);
+  const filterPriceRange = useFilterStore((state) => state.priceRange);
+  const filterCategories = useFilterStore((state) => state.categories);
   const setFiltersInStore = useFilterStore((state) => state.setFilters);
 
   useEffect(() => {
@@ -89,17 +87,17 @@ export default function CatalogPage() {
 
   const filteredVehicles = vehicles.filter((vehicle) => {
     // Brand filter
-    if (filters.brands.length > 0 && !filters.brands.includes(vehicle.models.brands.name)) {
+    if (filterBrands.length > 0 && !filterBrands.includes(vehicle.models.brands.name)) {
       return false;
     }
 
     // Price filter
-    if (vehicle.price_egp < filters.priceRange[0] || vehicle.price_egp > filters.priceRange[1]) {
+    if (vehicle.price_egp < filterPriceRange[0] || vehicle.price_egp > filterPriceRange[1]) {
       return false;
     }
 
     // Category filter
-    if (filters.categories.length > 0 && !filters.categories.includes(vehicle.categories.name)) {
+    if (filterCategories.length > 0 && !filterCategories.includes(vehicle.categories.name)) {
       return false;
     }
 
