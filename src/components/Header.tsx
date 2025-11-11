@@ -4,18 +4,23 @@ import { AppBar, Toolbar, Typography, IconButton, Badge, Button, Container } fro
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import { useLanguageStore } from '@/stores/language-store';
 import { useCompareStore } from '@/stores/compare-store';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 export default function Header() {
   const language = useLanguageStore((state) => state.language);
-  const setLanguage = useLanguageStore((state) => state.setLanguage);
   const compareItems = useCompareStore((state) => state.compareItems);
   const router = useRouter();
+  const pathname = usePathname();
+
+  const handleLanguageChange = (newLocale: 'en' | 'ar') => {
+    if (newLocale === language) return; // Skip if same
+    const newPath = pathname.replace(`/${language}`, `/${newLocale}`);
+    router.replace(newPath);
+  };
 
   const toggleLanguage = () => {
     const newLang = language === 'ar' ? 'en' : 'ar';
-    setLanguage(newLang);
-    router.push(`/${newLang}`);
+    handleLanguageChange(newLang);
   };
 
   const goToCompare = () => {
